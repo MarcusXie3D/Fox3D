@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cassert>
 #include <cstddef>
+#include <limits>
 
 Device::Device(void *fb, int width, int height) : m_width(width), m_height(height) {
 	int need = sizeof(void*) * (height * 2 + 1024) + width * height * 8;
@@ -11,7 +12,7 @@ Device::Device(void *fb, int width, int height) : m_width(width), m_height(heigh
 	int j;
 	assert(ptr);
 	m_framebuffer = (IUINT32**)ptr;
-	//device->zbuffer = (float**)(ptr + sizeof(void*) * height);
+	m_zbuffer = (float**)(ptr + sizeof(void*) * height);
 	ptr += sizeof(void*) * height * 2;
 	//device->texture = (IUINT32**)ptr;
 	ptr += sizeof(void*) * 1024;
@@ -21,7 +22,7 @@ Device::Device(void *fb, int width, int height) : m_width(width), m_height(heigh
 	if (fb != nullptr) framebuf = (char*)fb;
 	for (j = 0; j < height; j++) {
 		m_framebuffer[j] = (IUINT32*)(framebuf + width * 4 * j);
-		//device->zbuffer[j] = (float*)(zbuf + width * 4 * j);
+		m_zbuffer[j] = (float*)(zbuf + width * 4 * j);
 	}
 	//device->texture[0] = (IUINT32*)ptr;
 	//device->texture[1] = (IUINT32*)(ptr + 16);
@@ -40,7 +41,7 @@ Device::~Device() {
 	if (m_framebuffer)
 		delete[] m_framebuffer;
 	m_framebuffer = nullptr;
-	//device->zbuffer = NULL;
+	m_zbuffer = nullptr;
 	//device->texture = NULL;
 }
 
@@ -51,10 +52,10 @@ void Device::clear() {
 		IUINT32 cc = gdiColorTransform(m_background);
 		for (x = m_width; x > 0; dst++, x--) dst[0] = cc;
 	}
-	/*for (y = 0; y < device->height; y++) {
-		float *dst = device->zbuffer[y];
-		for (x = device->width; x > 0; dst++, x--) dst[0] = 0.0f;
-	}*/
+	for (y = 0; y < m_height; y++) {
+		float *dst = m_zbuffer[y];
+		for (x = m_width; x > 0; dst++, x--) dst[0] = 0.f;
+	}
 }
 
 IUINT32 Device::gdiColorTransform(XieColor color) {
@@ -64,7 +65,19 @@ IUINT32 Device::gdiColorTransform(XieColor color) {
 	return (r << 16) | (g << 8) | b;
 }
 
+float Device::getZbuffer(const int &x, const int &y) {
+	if (x >= 0 && x < m_width && y >= 0 && y < m_height)
+		return m_zbuffer[y][x];
+	else
+		return std::numeric_limits<float>::max();
+}
+
+void Device::setZbuffer(const int &x, const int &y, const float &oneOverZ) {
+	if (x >= 0 && x < m_width && y >= 0 && y < m_height)
+		m_zbuffer[y][x] = oneOverZ;
+}
+
 void Device::drawPixel(const int &x, const int &y, const XieColor &color) {
-	if(x >= 0 && x < m_width && y >= 0 && y < m_height)
-	m_framebuffer[y][x] = gdiColorTransform(color);
+	if (x >= 0 && x < m_width && y >= 0 && y < m_height)
+		m_framebuffer[y][x] = gdiColorTransform(color);
 }

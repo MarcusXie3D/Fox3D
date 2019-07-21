@@ -43,6 +43,7 @@ public:
 
 public:
 	XieColor(float p_r = 255.f, float p_g = 255.f, float p_b = 255.f, float p_a = 255.f) : r(p_r), g(p_g), b(p_b), a(p_a) {}
+
 	XieColor& operator= (const XieColor& p_v) {
 		if (this == &p_v)
 			return *this;
@@ -50,6 +51,14 @@ public:
 		this->g = p_v.g;
 		this->b = p_v.b;
 		this->a = p_v.a;
+		return *this;
+	}
+
+	XieColor& operator*= (const float& p_v) {
+		this->r = this->r * p_v;
+		this->g = this->g * p_v;
+		this->b = this->b * p_v;
+		this->a = this->a * p_v;
 		return *this;
 	}
 };

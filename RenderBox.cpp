@@ -13,8 +13,8 @@ RenderBox::RenderBox(Device *device) : m_device(device) {
 	m_shader = new Shader();
 	m_deviceContext->setShader(m_shader);
 
-	m_matScale = XieMathUtility::scale(1.f, 1.f, 1.f);
-	m_matRotate = XieMathUtility::rotate(1.f, 0.f, 0.f, 0.f);
+	m_matScale = XieMathUtility::scale(m_scale, m_scale, m_scale);
+	m_matRotate = XieMathUtility::rotate(-1, -0.5, 1, m_rotateAngle);
 	m_matTranslate = XieMathUtility::translate(0.f, 0.f, -5.f);
 
 	m_matModel = m_matTranslate * m_matRotate * m_matScale;
@@ -55,28 +55,29 @@ RenderBox::RenderBox(Device *device) : m_device(device) {
 void RenderBox::update() {
 	bool flagScale{ false };
 	bool flagRotate{ false };
+	const float speed{ 0.1f };
 
 	if (Screen::m_keys[VK_DOWN]) {
-		if (m_elongate > 0.01f) {
-			m_elongate -= 0.01f;
+		if (m_elongate > speed) {
+			m_elongate -= speed;
 			flagScale = true;
 		}
 	}
 	if (Screen::m_keys[VK_UP]) {
-		m_elongate += 0.01f;
+		m_elongate += speed;
 		flagScale = true;
 	}
 	if (Screen::m_keys[VK_LEFT]) {
-		m_rotateAngle += 0.01f;
+		m_rotateAngle += speed;
 		flagRotate = true;
 	}
 	if (Screen::m_keys[VK_RIGHT]) {
-		m_rotateAngle -= 0.01f;
+		m_rotateAngle -= speed;
 		flagRotate = true;
 	}
 
 	if(flagScale)
-		m_matScale = XieMathUtility::scale(1.f, m_elongate, 1.f);
+		m_matScale = XieMathUtility::scale(m_scale, m_elongate, m_scale);
 	if (flagRotate)
 		m_matRotate = XieMathUtility::rotate(-1, -0.5, 1, m_rotateAngle);
 	if (flagScale || flagRotate) {

@@ -2,6 +2,7 @@
 #include <array>
 #include <vector>
 #include <iostream> //for Debug
+#include <windows.h>// for Debug
 
 extern const float width, height;
 
@@ -94,11 +95,26 @@ void DeviceContext::transformNDC2screen(XieVertex &vert) {
 }
 
 void DeviceContext::drawScanline(const XieVertex &left, const XieVertex &right, const int &yRaster) {
+	//// Debug begins
+	//if (left.pos.x >= 0 && left.pos.x < width && right.pos.x >= 0 && right.pos.x < width)
+	//	;
+	//else
+	//	std::cout << left.pos.x << " " << right.pos.x << '\n';
+	//// Debug ends
 	int leftRaster = static_cast<int>(left.pos.x + 0.5f);
 	int rightRaster = static_cast<int>(right.pos.x + 0.5f);
 	float lineLengthRaster = static_cast<float>(rightRaster - leftRaster);
 	for (int xRaster = leftRaster; xRaster <= rightRaster; xRaster++) {
-		m_device->drawPixel(xRaster, yRaster, XieMathUtility::lerp(left.color, right.color, static_cast<float>(xRaster - leftRaster) / lineLengthRaster));
+		float coe = static_cast<float>(xRaster - leftRaster) / lineLengthRaster;
+		float oneOverZ = XieMathUtility::lerp(left.oneOverZ, right.oneOverZ, coe);
+		if (oneOverZ > m_device->getZbuffer(xRaster, yRaster)) {
+			m_device->setZbuffer(xRaster, yRaster, oneOverZ);
+			XieVertex vert = XieMathUtility::lerp(left, right, coe);
+			float Z = 1.f / oneOverZ;
+			vert.color *= Z;
+			// over here, lay other properties of vert
+			m_device->drawPixel(xRaster, yRaster, m_shader->fragmentShader(vert));
+		}
 	}
 }
 
@@ -108,6 +124,8 @@ void DeviceContext::drawUpward(const XieVertex &v1, const XieVertex &v2, const X
 	for (float yFormer = v1.pos.y; yFormer < v2.pos.y + 1.f; yFormer += 1.f) {
 		int yRaster = static_cast<int>(yFormer + 0.5f);
 		float coe = dy / yRangeFormer;
+		if (coe > 1.f)
+			coe = 1.f;
 		XieVertex endpointLeft = XieMathUtility::lerp(v1, v2, coe);
 		XieVertex endpointRight = XieMathUtility::lerp(v1, v3, coe);
 		drawScanline(endpointLeft, endpointRight, yRaster);
@@ -146,9 +164,13 @@ void DeviceContext::draw() {
 	//	flagT = false;
 	//}
 
-	//Clip left here
+	//Viewing Frustum Clipping is left here
 
 	for (auto &element : m_buffer) {
+		element.oneOverZ = 1.f / element.pos.w;
+		element.color *= element.oneOverZ;
+		// over here, add other properties of the vertexl
+
 		transformClip2NDC(element);
 		transformNDC2screen(element);
 	}
@@ -165,6 +187,7 @@ void DeviceContext::draw() {
 
 		if (tri == 2) {
 			tri = 0;
+			//std::cout << "3oneOverZs : " << v1.oneOverZ << " " << v2.oneOverZ << " " << v3.oneOverZ << "\n";// for Debug
 			drawTriangle(v1, v2, v3);
 		}
 		else

@@ -9,4 +9,6 @@ public:
 	void setMatMVP(const XieMatrix &matMVP);
 
 	void vertexShader(XieVertex &v);
+
+	XieColor fragmentShader(XieVertex &v);
 };

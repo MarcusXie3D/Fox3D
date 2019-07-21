@@ -26,7 +26,8 @@ XieColor XieMathUtility::lerp(const XieColor &v1, const XieColor &v2, const floa
 XieVertex XieMathUtility::lerp(const XieVertex &v1, const XieVertex &v2, const float &coe) {
 	return XieVertex(
 		lerp(v1.pos, v2.pos, coe),
-		lerp(v1.color, v2.color, coe)
+		lerp(v1.color, v2.color, coe),
+		lerp(v1.oneOverZ, v2.oneOverZ, coe)
 	);
 }
 

@@ -9,7 +9,8 @@
 class RenderBox {
 private:
 	float m_rotateAngle = 1.f;
-	float m_elongate = 1.f;
+	float m_scale = 3.f;
+	float m_elongate = m_scale;
 
 	XieMatrix m_matScale;
 	XieMatrix m_matRotate;

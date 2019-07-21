@@ -9,6 +9,10 @@ public:
 
 	void clear();
 
+	float getZbuffer(const int &x, const int &y);
+
+	void setZbuffer(const int &x, const int &y, const float &oneOverZ);
+
 	void drawPixel(const int &x, const int &y, const XieColor &color);
 
 private:
@@ -16,7 +20,7 @@ private:
 	int m_width;                  // 窗口宽度
 	int m_height;                 // 窗口高度
 	IUINT32 **m_framebuffer;      // 像素缓存：framebuffer[y] 代表第 y行
-	//float **zbuffer;            // 深度缓存：zbuffer[y] 为第 y行指针
+	float **m_zbuffer;            // 深度缓存：zbuffer[y] 为第 y行指针
 	//IUINT32 **texture;          // 纹理：同样是每行索引
 	//int tex_width;              // 纹理宽度
 	//int tex_height;             // 纹理高度

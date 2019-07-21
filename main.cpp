@@ -35,7 +35,7 @@ int main(void)
 		renderBox.render();
 
 		screen.update();
-		Sleep(1);
+		//Sleep(1); // commented for Debug
 	}
 
 	renderBox.clear();

@@ -7,3 +7,7 @@ void Shader::setMatMVP(const XieMatrix &matMVP) {
 void Shader::vertexShader(XieVertex &v) {
 	v.pos = m_matMVP * v.pos;
 }
+
+XieColor Shader::fragmentShader(XieVertex &v) {
+	return v.color;
+}

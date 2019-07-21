@@ -7,14 +7,17 @@ public:
 
 	XieColor color;
 
+	float oneOverZ;
+
 public:
 	XieVertex() {}
-	XieVertex(XieVector p_pos, XieColor p_color) : pos(p_pos), color(p_color) {}
+	XieVertex(XieVector p_pos, XieColor p_color, float p_oneOverZ = 1.f) : pos(p_pos), color(p_color), oneOverZ(p_oneOverZ) {}
 	XieVertex& operator= (const XieVertex& p_vert) {
 		if (this == &p_vert)
 			return *this;
 		this->pos = p_vert.pos;
 		this->color = p_vert.color;
+		this->oneOverZ = p_vert.oneOverZ;
 		return *this;
 	}
 };
