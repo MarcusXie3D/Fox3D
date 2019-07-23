@@ -60,7 +60,7 @@ RenderBox::RenderBox(Device *device) : m_device(device) {
 void RenderBox::update() {
 	bool flagScale{ false };
 	bool flagRotate{ false };
-	const float speed{ 0.1f };
+	const float speed{ 0.05f };
 
 	if (Screen::m_keys[VK_DOWN]) {
 		if (m_elongate > speed * 2) {

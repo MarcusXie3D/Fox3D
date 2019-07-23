@@ -157,48 +157,43 @@ void DeviceContext::drawDownward(XieVertex &v1, const XieVertex &v2, const XieVe
 	}
 }
 
-void DeviceContext::draw() {
-	//static bool flagT = true;//for Debug
+bool DeviceContext::cullBackface(const XieVertex &v1, const XieVertex &v2, const XieVertex &v3) {
+	XieVector vec1 = v3.pos - v2.pos;
+	XieVector vec2 = v2.pos - v1.pos;
+	XieVector normal = XieMathUtility::cross(vec1, vec2);
+	if (normal.z < 0.f)
+		return false;
+	else
+		return true;
+}
 
+void DeviceContext::draw() {
 	for (auto &element : m_buffer)
 		m_shader->vertexShader(element);
 
-	//if (flagT) {//for Debug
-	//	for (auto const &element : m_buffer) {
-	//		std::cout << element.pos.x << ' ';
-	//		std::cout << element.pos.y << ' ';
-	//		std::cout << element.pos.z << ' ';
-	//		std::cout << element.pos.w << ' ';
-	//		std::cout << '\n';
-	//	}
-
-	//	flagT = false;
-	//}
-
-	for (auto &element : m_buffer) {
-		element.oneOverZ = 1.f / element.pos.w;
-		element.color *= element.oneOverZ;
-		// over here, add other properties of the vertex
-
-		transformClip2NDC(element);
-		transformNDC2screen(element);
-	}
-
 	int tri = 0;
-	int normalIndex = 0;
-	XieVertex v1, v2, v3;
+	int normalIndex = -1;
+	std::array<XieVertex, 3> v;
 	for (unsigned int i = 0; i < m_indices.size(); i++) {
-		if (tri == 0)
-			v1 = m_buffer[m_indices[i]];
-		else if(tri == 1)
-			v2 = m_buffer[m_indices[i]];
-		else if(tri == 2)
-			v3 = m_buffer[m_indices[i]];
+		v[tri] = m_buffer[m_indices[i]];
 
 		if (tri == 2) {
 			tri = 0;
-			drawTriangle(v1, v2, v3, m_normals[normalIndex]);
 			normalIndex++;
+
+			if (cullBackface(v[0], v[1], v[2]))
+				continue;
+
+			for (unsigned int j = 0; j < 3; j++) {
+				v[j].oneOverZ = 1.f / v[j].pos.w;
+				v[j].color *= v[j].oneOverZ;
+				// over here, add other properties of the vertex
+
+				transformClip2NDC(v[j]);
+				transformNDC2screen(v[j]);
+			}
+
+			drawTriangle(v[0], v[1], v[2], m_normals[normalIndex]);
 		}
 		else
 			tri++;

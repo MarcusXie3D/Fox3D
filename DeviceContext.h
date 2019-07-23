@@ -14,6 +14,7 @@ public:
 	void draw();
 
 private:
+	bool cullBackface(const XieVertex &v1, const XieVertex &v2, const XieVertex &v3);
 	void transformClip2NDC(XieVertex &vert);
 	void transformNDC2screen(XieVertex &vert);
 	void drawTriangle(XieVertex &v1, XieVertex &v2, XieVertex &v3, XieVector normal);
