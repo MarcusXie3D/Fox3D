@@ -67,3 +67,14 @@ XieVector XieMatrix::operator*(XieVector &vi) {
 
 	return vo;
 }
+
+XieVector mat3::operator*(XieVector &vi) {
+	XieVector vo;
+
+	vo.x = m[0][0] * vi.x + m[0][1] * vi.y + m[0][2] * vi.z;
+	vo.y = m[1][0] * vi.x + m[1][1] * vi.y + m[1][2] * vi.z;
+	vo.z = m[2][0] * vi.x + m[2][1] * vi.y + m[2][2] * vi.z;
+	vo.w = 0.f;
+
+	return vo;
+}

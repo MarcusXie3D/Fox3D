@@ -31,8 +31,8 @@ Device::Device(void *fb, int width, int height) : m_width(width), m_height(heigh
 	//device->tex_height = 2;
 	//device->max_u = 1.0f;
 	//device->max_v = 1.0f;
-	m_foreground = XieColor(0.f, 255.f, 0.f);
-	m_background = XieColor(30.f, 30.f, 30.f);
+	m_foreground = XieColor(0.f, 1.f, 0.f);
+	m_background = XieColor(0.f, 0.f, 0.f);
 	//transform_init(&device->transform, width, height);
 	//device->render_state = RENDER_STATE_WIREFRAME;
 }
@@ -59,6 +59,11 @@ void Device::clear() {
 }
 
 IUINT32 Device::gdiColorTransform(XieColor color) {
+	color *= 255.f;
+	color.r = (color.r > 255.f) ? 255.f : color.r;
+	color.g = (color.g > 255.f) ? 255.f : color.g;
+	color.b = (color.b > 255.f) ? 255.f : color.b;
+
 	IUINT32 r = static_cast<IUINT32>(color.r);
 	IUINT32 g = static_cast<IUINT32>(color.g);
 	IUINT32 b = static_cast<IUINT32>(color.b);

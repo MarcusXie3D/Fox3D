@@ -19,7 +19,14 @@ void DeviceContext::setIndices(std::vector<int> indices) {
 	m_indices = indices;
 }
 
-void DeviceContext::drawTriangle(XieVertex &v1, XieVertex &v2, XieVertex &v3) {
+void DeviceContext::setNormals(std::vector<XieVector> normals) {
+	m_normals = normals;
+}
+
+void DeviceContext::drawTriangle(XieVertex &v1, XieVertex &v2, XieVertex &v3, XieVector normal) {
+
+	m_shader->faceShader(normal);
+
 	if (v2.pos.y == v3.pos.y) {
 		if (v2.pos.x > v3.pos.x) {
 			XieVertex temp = v2;
@@ -118,8 +125,9 @@ void DeviceContext::drawScanline(const XieVertex &left, const XieVertex &right, 
 	}
 }
 
-void DeviceContext::drawUpward(const XieVertex &v1, const XieVertex &v2, const XieVertex &v3) {
+void DeviceContext::drawUpward(XieVertex &v1, const XieVertex &v2, const XieVertex &v3) {
 	float dy = 0.f;
+	v1.pos.y -= 1.f;
 	float yRangeFormer = v2.pos.y - v1.pos.y;
 	for (float yFormer = v1.pos.y; yFormer < v2.pos.y + 1.f; yFormer += 1.f) {
 		int yRaster = static_cast<int>(yFormer + 0.5f);
@@ -133,12 +141,15 @@ void DeviceContext::drawUpward(const XieVertex &v1, const XieVertex &v2, const X
 	}
 }
 
-void DeviceContext::drawDownward(const XieVertex &v1, const XieVertex &v2, const XieVertex &v3) {
+void DeviceContext::drawDownward(XieVertex &v1, const XieVertex &v2, const XieVertex &v3) {
 	float dy = 0.f;
+	v1.pos.y += 1.f;
 	float yRangeFormer = v1.pos.y - v2.pos.y;
 	for (float yFormer = v1.pos.y; yFormer > v2.pos.y; yFormer -= 1.f) {
 		int yRaster = static_cast<int>(yFormer + 0.5f);
 		float coe = dy / yRangeFormer;
+		if (coe > 1.f)
+			coe = 1.f;
 		XieVertex endpointLeft = XieMathUtility::lerp(v1, v2, coe);
 		XieVertex endpointRight = XieMathUtility::lerp(v1, v3, coe);
 		drawScanline(endpointLeft, endpointRight, yRaster);
@@ -164,18 +175,17 @@ void DeviceContext::draw() {
 	//	flagT = false;
 	//}
 
-	//Viewing Frustum Clipping is left here
-
 	for (auto &element : m_buffer) {
 		element.oneOverZ = 1.f / element.pos.w;
 		element.color *= element.oneOverZ;
-		// over here, add other properties of the vertexl
+		// over here, add other properties of the vertex
 
 		transformClip2NDC(element);
 		transformNDC2screen(element);
 	}
 
 	int tri = 0;
+	int normalIndex = 0;
 	XieVertex v1, v2, v3;
 	for (unsigned int i = 0; i < m_indices.size(); i++) {
 		if (tri == 0)
@@ -187,8 +197,8 @@ void DeviceContext::draw() {
 
 		if (tri == 2) {
 			tri = 0;
-			//std::cout << "3oneOverZs : " << v1.oneOverZ << " " << v2.oneOverZ << " " << v3.oneOverZ << "\n";// for Debug
-			drawTriangle(v1, v2, v3);
+			drawTriangle(v1, v2, v3, m_normals[normalIndex]);
+			normalIndex++;
 		}
 		else
 			tri++;

@@ -34,3 +34,19 @@ public:
 	XieMatrix operator*(XieMatrix &mat);
 	XieVector operator*(XieVector &vi);
 };
+
+class mat3 {
+public:
+	float m[3][3];
+
+public:
+	mat3(const XieMatrix &mat) {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				m[i][j] = mat.m[i][j];
+			}
+		}
+	}
+
+	XieVector operator*(XieVector &vi);
+};

@@ -12,7 +12,7 @@ extern const float width{ 800 }, height{ 600 };
 
 typedef struct { float m[4][4]; } matrix_t;
 
-extern const float PI = 3.14159265;
+extern const float PI = 3.14159265f;
 
 int main(void)
 {

@@ -31,6 +31,13 @@ XieVertex XieMathUtility::lerp(const XieVertex &v1, const XieVertex &v2, const f
 	);
 }
 
+float XieMathUtility::max(float a, float b) {
+	if (b > a)
+		return b;
+	else
+		return a;
+}
+
 float XieMathUtility::dot(const XieVector &v1, const XieVector &v2) {
 	return v1.x * v2.x + v1.y*v2.y + v1.z*v2.z;
 }
@@ -41,6 +48,85 @@ XieVector XieMathUtility::cross(const XieVector &v1, const XieVector &v2) {
 		v1.z * v2.x - v1.x * v2.z,
 		v1.x * v2.y - v1.y * v2.x
 	);
+}
+
+XieMatrix XieMathUtility::transpose(const XieMatrix& mat) {
+	return XieMatrix(
+		mat.m[0][0], mat.m[1][0], mat.m[2][0], mat.m[3][0],
+		mat.m[0][1], mat.m[1][1], mat.m[2][1], mat.m[3][1],
+		mat.m[0][2], mat.m[1][2], mat.m[2][2], mat.m[3][2],
+		mat.m[0][3], mat.m[1][3], mat.m[2][3], mat.m[3][3]
+	);
+}
+
+float XieMathUtility::determinant(const XieMatrix& mat) {
+	float odet =
+		mat.m[0][0] * mat.m[1][1] * mat.m[2][2] * mat.m[3][3] - mat.m[0][0] * mat.m[1][1] * mat.m[2][3] * mat.m[3][2] -
+		mat.m[0][0] * mat.m[1][2] * mat.m[2][1] * mat.m[3][3] + mat.m[0][0] * mat.m[1][2] * mat.m[2][3] * mat.m[3][1] +
+
+		mat.m[0][0] * mat.m[1][3] * mat.m[2][1] * mat.m[3][2] - mat.m[0][0] * mat.m[1][3] * mat.m[2][2] * mat.m[3][1] -
+		mat.m[0][1] * mat.m[1][0] * mat.m[2][2] * mat.m[3][3] + mat.m[0][1] * mat.m[1][0] * mat.m[2][3] * mat.m[3][2] +
+
+		mat.m[0][1] * mat.m[1][2] * mat.m[2][0] * mat.m[3][3] - mat.m[0][1] * mat.m[1][2] * mat.m[2][3] * mat.m[3][0] -
+		mat.m[0][1] * mat.m[1][3] * mat.m[2][0] * mat.m[3][2] + mat.m[0][1] * mat.m[1][3] * mat.m[2][2] * mat.m[3][0] +
+
+		mat.m[0][2] * mat.m[1][0] * mat.m[2][1] * mat.m[3][3] - mat.m[0][2] * mat.m[1][0] * mat.m[2][3] * mat.m[3][1] -
+		mat.m[0][2] * mat.m[1][1] * mat.m[2][0] * mat.m[3][3] + mat.m[0][2] * mat.m[1][1] * mat.m[2][3] * mat.m[3][0] +
+
+		mat.m[0][2] * mat.m[1][3] * mat.m[2][0] * mat.m[3][1] - mat.m[0][2] * mat.m[1][3] * mat.m[2][1] * mat.m[3][0] -
+		mat.m[0][3] * mat.m[1][0] * mat.m[2][1] * mat.m[3][2] + mat.m[0][3] * mat.m[1][0] * mat.m[2][2] * mat.m[3][1] +
+
+		mat.m[0][3] * mat.m[1][1] * mat.m[2][0] * mat.m[3][2] - mat.m[0][3] * mat.m[1][1] * mat.m[2][2] * mat.m[3][0] -
+		mat.m[0][3] * mat.m[1][2] * mat.m[2][0] * mat.m[3][1] + mat.m[0][3] * mat.m[1][2] * mat.m[2][1] * mat.m[3][0];
+
+	return odet;
+}
+
+float XieMathUtility::adjElem(
+	const float &a1, const float &a2, const float &a3,
+	const float &b1, const float &b2, const float &b3,
+	const float &c1, const float &c2, const float &c3) {
+	return a1*(b2*c3 - c2*b3) - a2*(b1*c3 - c1*b3) + a3*(b1*c2 - c1*b2);
+}
+
+XieMatrix XieMathUtility::adjoint(const XieMatrix& mat) {
+	float a1 = adjElem(mat.m[1][1], mat.m[1][2], mat.m[1][3], mat.m[2][1], mat.m[2][2], mat.m[2][3], mat.m[3][1], mat.m[3][2], mat.m[3][3]);
+	float a2 = adjElem(mat.m[1][0], mat.m[1][2], mat.m[1][3], mat.m[2][0], mat.m[2][2], mat.m[2][3], mat.m[3][0], mat.m[3][2], mat.m[3][3]);
+	float a3 = adjElem(mat.m[1][0], mat.m[1][1], mat.m[1][3], mat.m[2][0], mat.m[2][1], mat.m[2][3], mat.m[3][0], mat.m[3][1], mat.m[3][3]);
+	float a4 = adjElem(mat.m[1][0], mat.m[1][1], mat.m[1][2], mat.m[2][0], mat.m[2][1], mat.m[2][2], mat.m[3][0], mat.m[3][1], mat.m[3][2]);
+	float b1 = adjElem(mat.m[0][1], mat.m[0][2], mat.m[0][3], mat.m[2][1], mat.m[2][2], mat.m[2][3], mat.m[3][1], mat.m[3][2], mat.m[3][3]);
+	float b2 = adjElem(mat.m[0][0], mat.m[0][2], mat.m[0][3], mat.m[2][0], mat.m[2][2], mat.m[2][3], mat.m[3][0], mat.m[3][2], mat.m[3][3]);
+	float b3 = adjElem(mat.m[0][0], mat.m[0][1], mat.m[0][3], mat.m[2][0], mat.m[2][1], mat.m[2][3], mat.m[3][0], mat.m[3][1], mat.m[3][3]);
+	float b4 = adjElem(mat.m[0][0], mat.m[0][1], mat.m[0][2], mat.m[2][0], mat.m[2][1], mat.m[2][2], mat.m[3][0], mat.m[3][1], mat.m[3][2]);
+	float c1 = adjElem(mat.m[0][1], mat.m[0][2], mat.m[0][3], mat.m[1][1], mat.m[1][2], mat.m[1][3], mat.m[3][1], mat.m[3][2], mat.m[3][3]);
+	float c2 = adjElem(mat.m[0][0], mat.m[0][2], mat.m[0][3], mat.m[1][0], mat.m[1][2], mat.m[1][3], mat.m[3][0], mat.m[3][2], mat.m[3][3]);
+	float c3 = adjElem(mat.m[0][0], mat.m[0][1], mat.m[0][3], mat.m[1][0], mat.m[1][1], mat.m[1][3], mat.m[3][0], mat.m[3][1], mat.m[3][3]);
+	float c4 = adjElem(mat.m[0][0], mat.m[0][1], mat.m[0][2], mat.m[1][0], mat.m[1][1], mat.m[1][2], mat.m[3][0], mat.m[3][1], mat.m[3][2]);
+	float d1 = adjElem(mat.m[0][1], mat.m[0][2], mat.m[0][3], mat.m[1][1], mat.m[1][2], mat.m[1][3], mat.m[2][1], mat.m[2][2], mat.m[2][3]);
+	float d2 = adjElem(mat.m[0][0], mat.m[0][2], mat.m[0][3], mat.m[1][0], mat.m[1][2], mat.m[1][3], mat.m[2][0], mat.m[2][2], mat.m[2][3]);
+	float d3 = adjElem(mat.m[0][0], mat.m[0][1], mat.m[0][3], mat.m[1][0], mat.m[1][1], mat.m[1][3], mat.m[2][0], mat.m[2][1], mat.m[2][3]);
+	float d4 = adjElem(mat.m[0][0], mat.m[0][1], mat.m[0][2], mat.m[1][0], mat.m[1][1], mat.m[1][2], mat.m[2][0], mat.m[2][1], mat.m[2][2]);
+
+	XieMatrix omat(
+		a1, -a2, a3, -a4,
+		-b1, b2, -b3, b4,
+		c1, -c2, c3, -c4,
+		-d1, d2, -d3, d4
+	);
+	return transpose(omat);
+}
+
+XieMatrix XieMathUtility::inverse(const XieMatrix &mat) {
+	float det = fabs(determinant(mat));
+	XieMatrix adj = adjoint(mat);
+	XieMatrix oInverse;
+	for (int i = 0; i < 4; ++i)
+		for (int j = 0; j < 4; ++j)
+		{
+			oInverse.m[i][j] = adj.m[i][j] / det;
+		}
+
+	return oInverse;
 }
 
 XieMatrix XieMathUtility::scale(const float &x, const float &y, const float &z) {

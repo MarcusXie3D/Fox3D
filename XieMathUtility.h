@@ -12,11 +12,26 @@ namespace XieMathUtility {
 
 	XieVertex lerp(const XieVertex &v1, const XieVertex &v2, const float &coe);
 
+	float max(float a, float b);
+
 	XieMatrix scale(const float &x, const float &y, const float &z);
 
 	float dot(const XieVector &v1, const XieVector &v2);
 
 	XieVector cross(const XieVector &v1, const XieVector &v2);
+
+	XieMatrix transpose(const XieMatrix& mat);
+
+	float determinant(const XieMatrix& mat);
+
+	float adjElem(
+		const float &a1, const float &a2, const float &a3,
+		const float &b1, const float &b2, const float &b3,
+		const float &c1, const float &c2, const float &c3);
+
+	XieMatrix adjoint(const XieMatrix& mat);
+
+	XieMatrix inverse(const XieMatrix &mat);
 
 	//phi needs to be an angle in radians
 	XieMatrix rotate(const float &x, const float &y, const float &z, const float &phi);
