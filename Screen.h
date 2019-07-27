@@ -10,24 +10,24 @@
 class Screen {
 public:
 	static int m_exit;
-	unsigned char *m_fb = NULL;		// frame buffer
-	static int m_keys[512];	// 当前键盘按下状态
+	unsigned char *m_fb = NULL;	
+	static int m_keys[512];	
 
 public:
-	int init(int w, int h, const char *title);	// 屏幕初始化
-	void dispatch(void);							// 处理消息
-	void update(void);							// 显示 FrameBuffer
+	int init(int w, int h, const char *title);	
+	void dispatch(void);							
+	void update(void);							
 
 private:
 	int m_w, m_h;
 	int m_mx = 0, m_my = 0, m_mb = 0;
-	HWND m_handle = NULL;		// 主窗口 HWND          
-	HDC m_dc = NULL;			// 配套的 HDC          
-	HBITMAP m_hb = NULL;		// DIB                
-	HBITMAP m_ob = NULL;		// 老的 BITMAP         
+	HWND m_handle = NULL;		  
+	HDC m_dc = NULL;		         
+	HBITMAP m_hb = NULL;	         
+	HBITMAP m_ob = NULL;	
 	long m_pitch = 0;
 
 private:
-	int close(void);								// 关闭屏幕
+	int close(void);							
 
 };

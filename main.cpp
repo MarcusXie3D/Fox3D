@@ -25,17 +25,16 @@ int main(void)
 
 	Device device(screen.m_fb, width, height);
 
-	RenderBox renderBox(&device);
+	RenderBox renderBox(&device, L"E:/GitHub/Fox3D/resource/tessellation.bmp");// Must be Full Path !!!!! for example: L"E:/GitHub/Fox3D/resource/tessellation.bmp"
 
 	while (screen.m_exit == 0 && screen.m_keys[VK_ESCAPE] == 0) {
 		screen.dispatch();
 		device.clear();
-
+		
 		renderBox.update();
 		renderBox.render();
-
+		
 		screen.update();
-		//Sleep(1); // commented for Debug
 	}
 
 	renderBox.clear();

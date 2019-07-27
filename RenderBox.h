@@ -5,6 +5,7 @@
 #include "DeviceContext.h"
 #include "Math.h"
 #include "Shader.h"
+#include "Texture.h"
 
 // Palette         R            G           B
 #define IVORY 0.94140625f, 0.9765625f, 0.9296875f
@@ -32,12 +33,7 @@ private:
 	Device *m_device;
 	DeviceContext *m_deviceContext;
 	Shader *m_shader;
-
-	/*XieTriangle m_triangle = XieTriangle(
-		XieVertex(XieVector(0.0f, 0.39f, 0.0f), XieColor(0, 0, 255)),
-		XieVertex(XieVector(0.95f, -0.35f, 0.0f), XieColor(0, 255, 0)),
-		XieVertex(XieVector(-0.46f, -0.8f, 0.0f), XieColor(255, 0, 0))
-	);*/
+	Texture m_tex;
 
 	std::vector<XieVertex> m_boxData = {
 		XieVertex(XieVector(1, -1, 1, 1), XieColor(TENDER_GREEN)),
@@ -49,46 +45,6 @@ private:
 		XieVertex(XieVector(-1, 1, -1, 1), XieColor(MILD_ORANGE)),
 		XieVertex(XieVector(1, 1, -1, 1), XieColor(TENDER_GREEN))
 	};
-	/*XieVertex(XieVector(1, -1, 1, 1), XieColor(0.0546875f, 0.37109375f, 0.609375f)),
-		XieVertex(XieVector(-1, -1, 1, 1), XieColor(0.0546875f, 0.37109375f, 0.609375f)),
-		XieVertex(XieVector(-1, 1, 1, 1), XieColor(0.0546875f, 0.37109375f, 0.609375f)),
-		XieVertex(XieVector(1, 1, 1, 1), XieColor(0.0546875f, 0.37109375f, 0.609375f)),
-		XieVertex(XieVector(1, -1, -1, 1), XieColor(0.0546875f, 0.37109375f, 0.609375f)),
-		XieVertex(XieVector(-1, -1, -1, 1), XieColor(0.0546875f, 0.37109375f, 0.609375f)),
-		XieVertex(XieVector(-1, 1, -1, 1), XieColor(0.0546875f, 0.37109375f, 0.609375f)),
-		XieVertex(XieVector(1, 1, -1, 1), XieColor(0.0546875f, 0.37109375f, 0.609375f))*/
-	/*XieVertex(XieVector(1, -1, 1, 1), XieColor(1.f, 0, 0)),
-		XieVertex(XieVector(-1, -1, 1, 1), XieColor(0, 0, 1.f)),
-		XieVertex(XieVector(-1, 1, 1, 1), XieColor(1.f, 0, 0)),
-		XieVertex(XieVector(1, 1, 1, 1), XieColor(0, 0, 1.f)),
-		XieVertex(XieVector(1, -1, -1, 1), XieColor(0, 0, 1.f)),
-		XieVertex(XieVector(-1, -1, -1, 1), XieColor(1.f, 0, 0)),
-		XieVertex(XieVector(-1, 1, -1, 1), XieColor(0, 0, 1.f)),
-		XieVertex(XieVector(1, 1, -1, 1), XieColor(1.f, 0, 0))*/
-	/*XieVertex(XieVector(1, -1, 1, 1), XieColor(255, 0, 0)),
-		XieVertex(XieVector(-1, -1, 1, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(-1, 1, 1, 1), XieColor(255, 0, 0)),
-		XieVertex(XieVector(1, 1, 1, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(1, -1, -1, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(-1, -1, -1, 1), XieColor(255, 0, 0)),
-		XieVertex(XieVector(-1, 1, -1, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(1, 1, -1, 1), XieColor(255, 0, 0))*/
-	/*XieVertex(XieVector(0.5, -0.5, 0.5, 1), XieColor(255, 0, 0)),
-		XieVertex(XieVector(-0.5, -0.5, 0.5, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(-0.5, 0.5, 0.5, 1), XieColor(255, 0, 0)),
-		XieVertex(XieVector(0.5, 0.5, 0.5, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(0.5, -0.5, -0.5, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(-0.5, -0.5, -0.5, 1), XieColor(255, 0, 0)),
-		XieVertex(XieVector(-0.5, 0.5, -0.5, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(0.5, 0.5, -0.5, 1), XieColor(255, 0, 0))*/
-	/*XieVertex(XieVector(2, -2, 2, 1), XieColor(255, 0, 0)),
-		XieVertex(XieVector(-2, -2, 2, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(-2, 2, 2, 1), XieColor(255, 0, 0)),
-		XieVertex(XieVector(2, 2, 2, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(2, -2, -2, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(-2, -2, -2, 1), XieColor(255, 0, 0)),
-		XieVertex(XieVector(-2, 2, -2, 1), XieColor(0, 0, 255)),
-		XieVertex(XieVector(2, 2, -2, 1), XieColor(255, 0, 0))*/
 
 	std::vector<int> m_indices = {
 		0, 2, 1,
@@ -108,6 +64,26 @@ private:
 
 		3, 4, 7,
 		3, 0, 4
+	};
+
+	std::vector<XieTexcoord> m_texcoords = {
+		XieTexcoord(0, 0), XieTexcoord(1, 1), XieTexcoord(0, 1),
+		XieTexcoord(0, 0), XieTexcoord(1, 0), XieTexcoord(1, 1),
+
+		XieTexcoord(0, 0), XieTexcoord(0, 1), XieTexcoord(1, 1),
+		XieTexcoord(0, 0), XieTexcoord(1, 1), XieTexcoord(1, 0),
+
+		XieTexcoord(0, 0), XieTexcoord(0, 1), XieTexcoord(1, 1),
+		XieTexcoord(0, 0), XieTexcoord(1, 1), XieTexcoord(1, 0),
+
+		XieTexcoord(0, 0), XieTexcoord(1, 1), XieTexcoord(1, 0),
+		XieTexcoord(0, 0), XieTexcoord(0, 1), XieTexcoord(1, 1),
+
+		XieTexcoord(0, 0), XieTexcoord(1, 1), XieTexcoord(1, 0),
+		XieTexcoord(0, 0), XieTexcoord(0, 1), XieTexcoord(1, 1),
+
+		XieTexcoord(0, 0), XieTexcoord(1, 1), XieTexcoord(1, 0),
+		XieTexcoord(0, 0), XieTexcoord(0, 1), XieTexcoord(1, 1)
 	};
 
 	std::vector<XieVector> m_normals = {
@@ -131,7 +107,7 @@ private:
 	};
 
 public:
-	RenderBox(Device *device);
+	RenderBox(Device *device, std::wstring filePath);
 
 	void update();
 

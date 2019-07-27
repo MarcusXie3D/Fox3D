@@ -1,6 +1,10 @@
 #include "Shader.h"
 #include <iostream>
 
+void Shader::setTexture(const Texture &tex) {
+	m_tex = tex;
+}
+
 void Shader::setMatModel(const XieMatrix &matModel) {
 	m_matModel = matModel;
 }
@@ -24,7 +28,7 @@ void Shader::faceShader(XieVector &normal) {
 	float ambientStrength = 0.1f;
 	XieColor ambient = m_lightColor * ambientStrength;
 
-	float diff = XieMathUtility::max(XieMathUtility::dot(normal, m_lightDir), 0.f);
+	float diff = XieMathUtility::maximum(XieMathUtility::dot(normal, m_lightDir), 0.f);
 	XieColor diffuse = m_lightColor * diff;
 
 	m_faceLight = ambient + diffuse;
@@ -34,6 +38,9 @@ void Shader::vertexShader(XieVertex &v) {
 	v.pos = m_matMVP * v.pos;
 }
 
-XieColor Shader::fragmentShader(XieVertex &v) {
-	return m_faceLight * v.color;
+XieColor Shader::fragmentShader(XieVertex &v, const bool &texMode) {
+	if (texMode) 
+		return m_faceLight * m_tex.sampleTex(v.uv.u, v.uv.v);
+	else 
+		return m_faceLight * v.color;
 }

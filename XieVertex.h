@@ -9,15 +9,18 @@ public:
 
 	float oneOverZ;
 
+	XieTexcoord uv;
+
 public:
 	XieVertex() {}
-	XieVertex(XieVector p_pos, XieColor p_color, float p_oneOverZ = 1.f) : pos(p_pos), color(p_color), oneOverZ(p_oneOverZ) {}
+	XieVertex(XieVector p_pos, XieColor p_color, float p_oneOverZ = 1.f, XieTexcoord p_uv = XieTexcoord(0, 0)) : pos(p_pos), color(p_color), oneOverZ(p_oneOverZ), uv(p_uv) {}
 	XieVertex& operator= (const XieVertex& p_vert) {
 		if (this == &p_vert)
 			return *this;
 		this->pos = p_vert.pos;
 		this->color = p_vert.color;
 		this->oneOverZ = p_vert.oneOverZ;
+		this->uv = p_vert.uv;
 		return *this;
 	}
 };

@@ -11,6 +11,8 @@ public:
 	void setBuffer(std::vector<XieVertex> buffer);
 	void setIndices(std::vector<int> indices);
 	void setNormals(std::vector<XieVector> normals);
+	void setTexcoords(std::vector<XieTexcoord> texcoords);
+	void switchMode();
 	void draw();
 
 private:
@@ -28,4 +30,6 @@ private:
 	std::vector<XieVertex> m_buffer;
 	std::vector<int> m_indices;
 	std::vector<XieVector> m_normals;
+	bool m_texMode = true;
+	std::vector<XieTexcoord> m_texcoords;
 };

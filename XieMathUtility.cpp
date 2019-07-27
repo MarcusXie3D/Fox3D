@@ -23,15 +23,30 @@ XieColor XieMathUtility::lerp(const XieColor &v1, const XieColor &v2, const floa
 	);
 }
 
-XieVertex XieMathUtility::lerp(const XieVertex &v1, const XieVertex &v2, const float &coe) {
-	return XieVertex(
-		lerp(v1.pos, v2.pos, coe),
-		lerp(v1.color, v2.color, coe),
-		lerp(v1.oneOverZ, v2.oneOverZ, coe)
+XieTexcoord XieMathUtility::lerp(const XieTexcoord &v1, const XieTexcoord &v2, const float &coe) {
+	return XieTexcoord(
+		lerp(v1.u, v2.u, coe),
+		lerp(v1.v, v2.v, coe)
 	);
 }
 
-float XieMathUtility::max(float a, float b) {
+XieVertex XieMathUtility::lerp(const XieVertex &v1, const XieVertex &v2, const float &coe, const bool &texMode) {
+	if(texMode)
+		return XieVertex(
+			lerp(v1.pos, v2.pos, coe),
+			XieColor(),
+			lerp(v1.oneOverZ, v2.oneOverZ, coe),
+			lerp(v1.uv, v2.uv, coe)
+		);
+	else
+		return XieVertex(
+			lerp(v1.pos, v2.pos, coe),
+			lerp(v1.color, v2.color, coe),
+			lerp(v1.oneOverZ, v2.oneOverZ, coe)
+		);
+}
+
+float XieMathUtility::maximum(float a, float b) {
 	if (b > a)
 		return b;
 	else

@@ -5,7 +5,6 @@ int Screen::m_keys[512];
 
 static LRESULT events(HWND, UINT, WPARAM, LPARAM);
 
-// 初始化窗口并设置标题
 int Screen::init(int w, int h, const char *title) {
 	WNDCLASSA wc = { CS_BYTEALIGNCLIENT, (WNDPROC)events, 0, 0, 0,
 		NULL, NULL, NULL, NULL, "SCREEN3.1415926" };

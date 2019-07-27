@@ -1,8 +1,6 @@
 #include "DeviceContext.h"
 #include <array>
 #include <vector>
-#include <iostream> //for Debug
-#include <windows.h>// for Debug
 
 extern const float width, height;
 
@@ -23,8 +21,11 @@ void DeviceContext::setNormals(std::vector<XieVector> normals) {
 	m_normals = normals;
 }
 
-void DeviceContext::drawTriangle(XieVertex &v1, XieVertex &v2, XieVertex &v3, XieVector normal) {
+void DeviceContext::setTexcoords(std::vector<XieTexcoord> texcoords) {
+	m_texcoords = texcoords;
+}
 
+void DeviceContext::drawTriangle(XieVertex &v1, XieVertex &v2, XieVertex &v3, XieVector normal) {
 	m_shader->faceShader(normal);
 
 	if (v2.pos.y == v3.pos.y) {
@@ -73,7 +74,7 @@ void DeviceContext::drawTriangle(XieVertex &v1, XieVertex &v2, XieVertex &v3, Xi
 		XieVertex top = verts[0];
 		XieVertex middle = verts[1];
 		XieVertex bottom = verts[2];
-		XieVertex middleLevel = XieMathUtility::lerp(top, bottom, (middle.pos.y - top.pos.y) / (bottom.pos.y - top.pos.y));
+		XieVertex middleLevel = XieMathUtility::lerp(top, bottom, (middle.pos.y - top.pos.y) / (bottom.pos.y - top.pos.y), m_texMode);
 
 		if (middle.pos.x > middleLevel.pos.x) {
 			XieVertex temp = middle;
@@ -102,12 +103,6 @@ void DeviceContext::transformNDC2screen(XieVertex &vert) {
 }
 
 void DeviceContext::drawScanline(const XieVertex &left, const XieVertex &right, const int &yRaster) {
-	//// Debug begins
-	//if (left.pos.x >= 0 && left.pos.x < width && right.pos.x >= 0 && right.pos.x < width)
-	//	;
-	//else
-	//	std::cout << left.pos.x << " " << right.pos.x << '\n';
-	//// Debug ends
 	int leftRaster = static_cast<int>(left.pos.x + 0.5f);
 	int rightRaster = static_cast<int>(right.pos.x + 0.5f);
 	float lineLengthRaster = static_cast<float>(rightRaster - leftRaster);
@@ -116,11 +111,11 @@ void DeviceContext::drawScanline(const XieVertex &left, const XieVertex &right, 
 		float oneOverZ = XieMathUtility::lerp(left.oneOverZ, right.oneOverZ, coe);
 		if (oneOverZ > m_device->getZbuffer(xRaster, yRaster)) {
 			m_device->setZbuffer(xRaster, yRaster, oneOverZ);
-			XieVertex vert = XieMathUtility::lerp(left, right, coe);
+			XieVertex vert = XieMathUtility::lerp(left, right, coe, m_texMode);
 			float Z = 1.f / oneOverZ;
 			vert.color *= Z;
-			// over here, lay other properties of vert
-			m_device->drawPixel(xRaster, yRaster, m_shader->fragmentShader(vert));
+			vert.uv *= Z;
+			m_device->drawPixel(xRaster, yRaster, m_shader->fragmentShader(vert, m_texMode));
 		}
 	}
 }
@@ -134,8 +129,8 @@ void DeviceContext::drawUpward(XieVertex &v1, const XieVertex &v2, const XieVert
 		float coe = dy / yRangeFormer;
 		if (coe > 1.f)
 			coe = 1.f;
-		XieVertex endpointLeft = XieMathUtility::lerp(v1, v2, coe);
-		XieVertex endpointRight = XieMathUtility::lerp(v1, v3, coe);
+		XieVertex endpointLeft = XieMathUtility::lerp(v1, v2, coe, m_texMode);
+		XieVertex endpointRight = XieMathUtility::lerp(v1, v3, coe, m_texMode);
 		drawScanline(endpointLeft, endpointRight, yRaster);
 		dy += 1.f;
 	}
@@ -150,8 +145,8 @@ void DeviceContext::drawDownward(XieVertex &v1, const XieVertex &v2, const XieVe
 		float coe = dy / yRangeFormer;
 		if (coe > 1.f)
 			coe = 1.f;
-		XieVertex endpointLeft = XieMathUtility::lerp(v1, v2, coe);
-		XieVertex endpointRight = XieMathUtility::lerp(v1, v3, coe);
+		XieVertex endpointLeft = XieMathUtility::lerp(v1, v2, coe, m_texMode);
+		XieVertex endpointRight = XieMathUtility::lerp(v1, v3, coe, m_texMode);
 		drawScanline(endpointLeft, endpointRight, yRaster);
 		dy += 1.f;
 	}
@@ -167,6 +162,10 @@ bool DeviceContext::cullBackface(const XieVertex &v1, const XieVertex &v2, const
 		return true;
 }
 
+void DeviceContext::switchMode() {
+	m_texMode = !m_texMode;
+}
+
 void DeviceContext::draw() {
 	for (auto &element : m_buffer)
 		m_shader->vertexShader(element);
@@ -176,6 +175,8 @@ void DeviceContext::draw() {
 	std::array<XieVertex, 3> v;
 	for (unsigned int i = 0; i < m_indices.size(); i++) {
 		v[tri] = m_buffer[m_indices[i]];
+		if (m_texMode)
+			v[tri].uv = m_texcoords[i];
 
 		if (tri == 2) {
 			tri = 0;
@@ -187,7 +188,8 @@ void DeviceContext::draw() {
 			for (unsigned int j = 0; j < 3; j++) {
 				v[j].oneOverZ = 1.f / v[j].pos.w;
 				v[j].color *= v[j].oneOverZ;
-				// over here, add other properties of the vertex
+				if(m_texMode)
+					v[j].uv *= v[j].oneOverZ;
 
 				transformClip2NDC(v[j]);
 				transformNDC2screen(v[j]);

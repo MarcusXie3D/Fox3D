@@ -7,14 +7,13 @@
 
 Device::Device(void *fb, int width, int height) : m_width(width), m_height(height) {
 	int need = sizeof(void*) * (height * 2 + 1024) + width * height * 8;
-	char *ptr = new char[need + 64];//(char*)malloc(need + 64);
+	char *ptr = new char[need + 64];
 	char *framebuf, *zbuf;
 	int j;
 	assert(ptr);
 	m_framebuffer = (IUINT32**)ptr;
 	m_zbuffer = (float**)(ptr + sizeof(void*) * height);
 	ptr += sizeof(void*) * height * 2;
-	//device->texture = (IUINT32**)ptr;
 	ptr += sizeof(void*) * 1024;
 	framebuf = (char*)ptr;
 	zbuf = (char*)ptr + width * height * 4;
@@ -24,17 +23,8 @@ Device::Device(void *fb, int width, int height) : m_width(width), m_height(heigh
 		m_framebuffer[j] = (IUINT32*)(framebuf + width * 4 * j);
 		m_zbuffer[j] = (float*)(zbuf + width * 4 * j);
 	}
-	//device->texture[0] = (IUINT32*)ptr;
-	//device->texture[1] = (IUINT32*)(ptr + 16);
-	//memset(device->texture[0], 0, 64);
-	//device->tex_width = 2;
-	//device->tex_height = 2;
-	//device->max_u = 1.0f;
-	//device->max_v = 1.0f;
 	m_foreground = XieColor(0.f, 1.f, 0.f);
 	m_background = XieColor(0.f, 0.f, 0.f);
-	//transform_init(&device->transform, width, height);
-	//device->render_state = RENDER_STATE_WIREFRAME;
 }
 
 Device::~Device() {
@@ -42,11 +32,10 @@ Device::~Device() {
 		delete[] m_framebuffer;
 	m_framebuffer = nullptr;
 	m_zbuffer = nullptr;
-	//device->texture = NULL;
 }
 
 void Device::clear() {
-	int y, x;// , height = device->height;
+	int y, x;
 	for (y = 0; y < m_height; y++) {
 		IUINT32 *dst = m_framebuffer[y];
 		IUINT32 cc = gdiColorTransform(m_background);

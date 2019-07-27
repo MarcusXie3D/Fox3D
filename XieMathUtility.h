@@ -10,9 +10,11 @@ namespace XieMathUtility {
 
 	XieColor lerp(const XieColor &v1, const XieColor &v2, const float &coe);
 
-	XieVertex lerp(const XieVertex &v1, const XieVertex &v2, const float &coe);
+	XieTexcoord lerp(const XieTexcoord &v1, const XieTexcoord &v2, const float &coe);
 
-	float max(float a, float b);
+	XieVertex lerp(const XieVertex &v1, const XieVertex &v2, const float &coe, const bool &texMode);
+
+	float maximum(float a, float b);
 
 	XieMatrix scale(const float &x, const float &y, const float &z);
 

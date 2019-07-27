@@ -81,3 +81,9 @@ XieColor& XieColor::operator*= (const float& p_v) {
 	this->a = this->a * p_v;
 	return *this;
 }
+
+XieTexcoord& XieTexcoord::operator*= (const float& p_v) {
+	this->u = this->u * p_v;
+	this->v = this->v * p_v;
+	return *this;
+}

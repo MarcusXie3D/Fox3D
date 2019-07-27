@@ -2,13 +2,12 @@
 #include "Screen.h"
 #include "Math.h"
 #include "DeviceContext.h"
-
-#include <iostream> // for Debug
+#include "loadTexture.h"
 
 extern const float width, height;
 extern const float PI;
 
-RenderBox::RenderBox(Device *device) : m_device(device) {
+RenderBox::RenderBox(Device *device, std::wstring filePath) : m_device(device) {
 	m_deviceContext = new DeviceContext(device);
 	m_shader = new Shader();
 	m_deviceContext->setShader(m_shader);
@@ -27,40 +26,26 @@ RenderBox::RenderBox(Device *device) : m_device(device) {
 	m_matVP = matProject * matView;
 	m_matMVP = m_matVP * m_matModel;
 
-	//// Debug section begins
-	//XieVector vec(0.5f, 0.5f, 0.5f, 1.f);
-	//XieVector vecDub(1.f, 1.f, 1.f, 1.f);
-	//vec = m_matMVP * vec;
-	//vecDub = m_matMVP * vecDub;
-
-	//std::cout << "one" << ' ';
-	//std::cout << vec.x << ' ';
-	//std::cout << vec.y << ' ';
-	//std::cout << vec.z << ' ';
-	//std::cout << vec.w << ' ';
-	//std::cout << '\n';
-
-	//std::cout << "two" << ' ';
-	//std::cout << vecDub.x << ' ';
-	//std::cout << vecDub.y << ' ';
-	//std::cout << vecDub.z << ' ';
-	//std::cout << vecDub.w << ' ';
-	//std::cout << '\n';
-	//std::cout << '\n';
-	//// Debug section ends
-
 	m_shader->setMatModel(m_matModel);
 	m_shader->setMatMVP(m_matMVP);
 	m_shader->setLightColor(m_lightColor);
 	m_lightDir = -m_lightDir;
 	m_lightDir.normalize();
 	m_shader->setLightDir(m_lightDir);
+	m_tex = XieMathUtility::loadTexture(filePath);
+	m_shader->setTexture(m_tex);
+
+	m_deviceContext->setIndices(m_indices);
+	m_deviceContext->setNormals(m_normals);
+	m_deviceContext->setTexcoords(m_texcoords);
 }
 
 void RenderBox::update() {
 	bool flagScale{ false };
 	bool flagRotate{ false };
-	const float speed{ 0.05f };
+	const float speed{ 0.03f };
+	static bool space = false;
+	static bool spaceFormer = false;// used for edge detection, in order to prevent continuous switch between Color and Texture mode, which causes flash  
 
 	if (Screen::m_keys[VK_DOWN]) {
 		if (m_elongate > speed * 2) {
@@ -80,6 +65,16 @@ void RenderBox::update() {
 		m_rotateAngle -= speed;
 		flagRotate = true;
 	}
+	if (Screen::m_keys[VK_SPACE]) {
+		spaceFormer = space;
+		space = true;
+		if(spaceFormer == false && space == true) // an edge detected
+			m_deviceContext->switchMode();
+	}
+	else {
+		spaceFormer = space;
+		space = false;
+	}
 
 	if(flagScale)
 		m_matScale = XieMathUtility::scale(m_scale, m_elongate, m_scale);
@@ -95,8 +90,6 @@ void RenderBox::update() {
 
 void RenderBox::render() {
 	m_deviceContext->setBuffer(m_boxData);
-	m_deviceContext->setIndices(m_indices);
-	m_deviceContext->setNormals(m_normals);
 	m_deviceContext->draw();
 }
 
