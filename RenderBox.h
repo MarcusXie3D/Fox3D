@@ -7,6 +7,8 @@
 #include "Shader.h"
 #include "Texture.h"
 
+#include <string>
+
 // Palette         R            G           B
 #define IVORY 0.94140625f, 0.9765625f, 0.9296875f
 #define NAVY 0.11328125f, 0.20703125f, 0.33984375f
